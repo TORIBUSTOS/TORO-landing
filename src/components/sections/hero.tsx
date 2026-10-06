@@ -13,12 +13,12 @@ export function Hero({ copy }: { copy: Copy["hero"] }) {
         aria-hidden="true"
         className="pointer-events-none absolute inset-0 -z-10 bg-[radial-gradient(60%_50%_at_50%_0%,color-mix(in_oklch,var(--color-primary),transparent_88%),transparent)]"
       />
-      <div className="mx-auto flex max-w-4xl flex-col items-start gap-8 text-left">
-        <span className="rounded-full border border-white/10 px-3 py-1 text-xs font-medium tracking-wide text-muted-foreground uppercase">
+      <div className="mx-auto flex max-w-3xl flex-col items-start gap-8 text-left">
+        <span className="rounded-full border border-white/10 px-3 py-1 text-xs font-medium tracking-wide text-muted-foreground">
           {copy.eyebrow}
         </span>
 
-        <h1 className="text-4xl font-semibold tracking-tight text-foreground sm:text-5xl md:text-6xl">
+        <h1 className="text-3xl font-semibold tracking-tight text-foreground sm:text-4xl md:text-5xl">
           {copy.heading}
         </h1>
 

@@ -16,12 +16,12 @@ export function Header({ copy }: { copy: Copy["nav"] }) {
           <span className="sr-only">{copy.logoLabel} — inicio</span>
         </Link>
 
-        <nav aria-label="Principal" className="hidden items-center gap-8 md:flex">
+        <nav aria-label="Principal" className="hidden items-center gap-6 lg:flex">
           {copy.links.map((link) => (
             <Link
               key={link.href}
               href={link.href}
-              className="text-sm text-muted-foreground transition-colors hover:text-foreground focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-ring"
+              className="text-sm whitespace-nowrap text-muted-foreground transition-colors hover:text-foreground focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-ring"
             >
               {link.label}
             </Link>
@@ -31,7 +31,12 @@ export function Header({ copy }: { copy: Copy["nav"] }) {
         <Button
           size="sm"
           className="shrink-0"
-          render={<Link href="#contacto">{copy.cta}</Link>}
+          render={
+            <Link href="#contacto">
+              <span className="sm:hidden">{copy.ctaShort}</span>
+              <span className="hidden sm:inline">{copy.cta}</span>
+            </Link>
+          }
         />
       </div>
     </header>

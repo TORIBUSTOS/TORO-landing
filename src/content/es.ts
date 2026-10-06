@@ -4,6 +4,13 @@
  * Todo el contenido textual de la landing vive acá, desacoplado del markup,
  * para que una v2 con `next-intl` pueda agregar `en.ts` sin tocar componentes:
  * los componentes solo consumen la forma de `Copy`, nunca strings sueltos.
+ *
+ * Dos fuentes de copy conviven a propósito, sin mezclarse en una misma
+ * sección (ver issue OPS-89):
+ * - Canon de marca de `toro.toroverse.tech` (statement, propósito,
+ *   framework, dirección) — texto literal, no reescribir.
+ * - Copy comercial de Rodrigo para esta landing (capacidades, portfolio) —
+ *   redacción propia de la landing, ya aprobada.
  */
 
 export type CapabilityItem = {
@@ -19,6 +26,17 @@ export type PortfolioCase = {
   result: string
 }
 
+export type FrameworkStep = {
+  number: string
+  title: string
+  description: string
+}
+
+export type DirectoryEntry = {
+  name: string
+  role: string
+}
+
 export type Copy = {
   meta: {
     title: string
@@ -28,6 +46,8 @@ export type Copy = {
     logoLabel: string
     links: { label: string; href: string }[]
     cta: string
+    /** Versión corta del CTA para el header en pantallas angostas (<640px). */
+    ctaShort: string
   }
   hero: {
     eyebrow: string
@@ -41,6 +61,13 @@ export type Copy = {
     heading: string
     items: CapabilityItem[]
   }
+  framework: {
+    eyebrow: string
+    heading: string
+    subheading: string
+    steps: FrameworkStep[]
+    foundationLinkLabel: string
+  }
   portfolio: {
     eyebrow: string
     heading: string
@@ -51,8 +78,9 @@ export type Copy = {
   about: {
     eyebrow: string
     heading: string
-    paragraphs: string[]
-    pillars: { title: string; description: string }[]
+    purpose: string
+    directoryHeading: string
+    directory: DirectoryEntry[]
   }
   contact: {
     eyebrow: string
@@ -79,31 +107,38 @@ export type Copy = {
   }
   footer: {
     tagline: string
+    foundationLinkLabel: string
     rights: (year: number) => string
   }
 }
 
 export const copy: Copy = {
   meta: {
-    title: "TORO — Arquitectura digital y agentes inteligentes para operaciones críticas",
+    title: "TORO — Building intelligence. Creating impact.",
     description:
-      "TORO es una firma de desarrollo tecnológico y arquitectura digital especializada en soluciones de software modular, analítica financiera y orquestación de agentes inteligentes para operaciones críticas.",
+      "TORO integra estrategia, productos, sistemas e inteligencia artificial para convertir complejidad en decisiones, ejecución y aprendizaje trazables.",
   },
   nav: {
     logoLabel: "TORO",
     links: [
       { label: "Capacidades", href: "#capacidades" },
+      { label: "Framework", href: "#framework" },
       { label: "Portfolio", href: "#portfolio" },
       { label: "Sobre TORO", href: "#sobre-toro" },
       { label: "Contacto", href: "#contacto" },
     ],
     cta: "Hablemos de tu infraestructura",
+    ctaShort: "Contacto",
   },
   hero: {
-    eyebrow: "Arquitectura digital para operaciones críticas",
-    heading: "Infraestructura de software que sostiene decisiones críticas",
+    // Tagline CANONICAL de organization.json — ver src/lib/site-config.ts.
+    eyebrow: "Building intelligence. Creating impact.",
+    // Statement institucional literal (canon de marca, no redactar propio).
+    heading:
+      "TORO integra estrategia, productos, sistemas e inteligencia artificial para convertir complejidad en decisiones, ejecución y aprendizaje trazables.",
+    // Propósito literal (canon de marca).
     positioning:
-      "TORO es una firma de desarrollo tecnológico y arquitectura digital especializada en soluciones de software modular, analítica financiera y orquestación de agentes inteligentes para operaciones críticas.",
+      "Construir y operar sistemas útiles que aumenten claridad, control, capacidad de ejecución y continuidad.",
     ctaPrimary: "Hablemos de tu infraestructura",
     ctaSecondary: "Ver portfolio",
   },
@@ -132,6 +167,44 @@ export const copy: Copy = {
           "Integración de herramientas de gestión interna y migración de flujos manuales a entornos digitales centralizados.",
       },
     ],
+  },
+  framework: {
+    eyebrow: "Framework operativo",
+    heading: "Cómo operamos",
+    subheading:
+      "Cinco pasos, el mismo orden en cada sistema que construimos u operamos.",
+    // Pasos y descripciones literales del canon (CANONICAL en origen),
+    // ya condensados a una línea por paso — el detalle extendido vive en
+    // la public foundation.
+    steps: [
+      {
+        number: "01",
+        title: "Observar",
+        description: "Leer el sistema real antes de proponer cambios.",
+      },
+      {
+        number: "02",
+        title: "Decidir",
+        description: "Separar evidencia, supuestos y recomendación.",
+      },
+      {
+        number: "03",
+        title: "Ejecutar",
+        description: "Avanzar con el movimiento más simple, útil y reversible.",
+      },
+      {
+        number: "04",
+        title: "Verificar",
+        description: "Comprobar funcionamiento, riesgos y efecto operativo.",
+      },
+      {
+        number: "05",
+        title: "Documentar",
+        description:
+          "Dejar fuente, estado, decisión y continuidad para el siguiente agente.",
+      },
+    ],
+    foundationLinkLabel: "Public foundation",
   },
   portfolio: {
     eyebrow: "Portfolio",
@@ -172,24 +245,15 @@ export const copy: Copy = {
   },
   about: {
     eyebrow: "Sobre TORO",
-    heading: "Ingeniería que se hace cargo de la operación",
-    paragraphs: [
-      "TORO es una firma de desarrollo tecnológico y arquitectura digital especializada en soluciones de software modular, analítica financiera y orquestación de agentes inteligentes para operaciones críticas.",
-      "Trabajamos codo a codo con equipos de operaciones, finanzas y tecnología para transformar flujos manuales en sistemas modulares, auditables y preparados para escalar.",
-    ],
-    pillars: [
-      {
-        title: "Modularidad",
-        description: "Sistemas desacoplados que evolucionan sin reescribirse.",
-      },
-      {
-        title: "Trazabilidad",
-        description: "Cada proceso crítico queda registrado y es auditable.",
-      },
-      {
-        title: "Orquestación",
-        description: "Agentes e integraciones que operan en tiempo real.",
-      },
+    heading: "Propósito",
+    // Propósito literal (canon de marca).
+    purpose:
+      "Construir y operar sistemas útiles que aumenten claridad, control, capacidad de ejecución y continuidad.",
+    directoryHeading: "Dirección",
+    // Mención breve — el perfil extendido vive en la public foundation.
+    directory: [
+      { name: "Tori", role: "Fundador y Director Ejecutivo" },
+      { name: "Rosario", role: "Chief Strategy, Systems & Execution" },
     ],
   },
   contact: {
@@ -217,7 +281,8 @@ export const copy: Copy = {
     },
   },
   footer: {
-    tagline: "Arquitectura digital y agentes inteligentes para operaciones críticas.",
+    tagline: "Building intelligence. Creating impact.",
+    foundationLinkLabel: "Public foundation",
     rights: (year: number) => `© ${year} TORO. Todos los derechos reservados.`,
   },
 }

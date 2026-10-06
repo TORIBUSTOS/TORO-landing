@@ -1,6 +1,7 @@
 "use server"
 
 import { headers } from "next/headers"
+import { Resend } from "resend"
 
 import {
   contactSchema,
@@ -26,9 +27,34 @@ function isRateLimited(ip: string): boolean {
   return recent.length > RATE_LIMIT_MAX_REQUESTS
 }
 
+/**
+ * Orden de precedencia (ver issue OPS-89 — "Entrega del formulario"), para
+ * que el build y el deploy nunca dependan de que exista una credencial:
+ *
+ * 1. `RESEND_API_KEY` + `CONTACT_TO_EMAIL` → envía por Resend.
+ * 2. `CONTACT_WEBHOOK_URL` → POST del payload a ese webhook.
+ * 3. Ninguna configurada → loguea server-side y degrada a éxito sin
+ *    exponer el detalle al usuario.
+ */
 async function dispatchContactMessage(input: Omit<ContactInput, "company_website">) {
-  const webhookUrl = process.env.CONTACT_WEBHOOK_URL
+  const resendApiKey = process.env.RESEND_API_KEY
   const toEmail = process.env.CONTACT_TO_EMAIL
+  const webhookUrl = process.env.CONTACT_WEBHOOK_URL
+
+  if (resendApiKey && toEmail) {
+    const resend = new Resend(resendApiKey)
+    const { error } = await resend.emails.send({
+      from: "TORO Landing <onboarding@resend.dev>",
+      to: toEmail,
+      replyTo: input.email,
+      subject: `Nuevo contacto — ${input.company}`,
+      text: `Nombre: ${input.name}\nEmpresa: ${input.company}\nEmail: ${input.email}\n\n${input.message}`,
+    })
+    if (error) {
+      throw new Error(`Resend respondió con error: ${error.message}`)
+    }
+    return
+  }
 
   if (webhookUrl) {
     const response = await fetch(webhookUrl, {
@@ -42,20 +68,11 @@ async function dispatchContactMessage(input: Omit<ContactInput, "company_website
     return
   }
 
-  if (toEmail) {
-    // El destino real todavía no define un proveedor de email (ver README).
-    // Se deja registrado en los logs del server para no perder el lead
-    // mientras se conecta un proveedor (p. ej. Resend) detrás de esta misma
-    // variable de entorno.
-    console.info(
-      `[contact] CONTACT_TO_EMAIL configurado (${toEmail}) sin proveedor de email conectado. Lead recibido:`,
-      input
-    )
-    return
-  }
-
+  // Ninguna credencial configurada todavía (RESEND_API_KEY pendiente de
+  // Rodrigo — ver README). El formulario sigue funcionando de punta a
+  // punta para quien lo completa; el lead queda solo en los logs.
   console.warn(
-    "[contact] Ni CONTACT_WEBHOOK_URL ni CONTACT_TO_EMAIL están configuradas. Lead no despachado a ningún destino externo:",
+    "[contact] Ninguna variable de entrega configurada (RESEND_API_KEY/CONTACT_TO_EMAIL/CONTACT_WEBHOOK_URL). Lead no despachado a ningún destino externo:",
     input
   )
 }

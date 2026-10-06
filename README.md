@@ -1,9 +1,17 @@
 ## TORO — Landing institucional (v1)
 
-Landing de una sola página, formato portfolio, para TORO (firma de desarrollo
-tecnológico y arquitectura digital). Next.js (App Router) + TypeScript
-estricto + Tailwind CSS v4 + shadcn/ui, estética dark-tech sobre fondo
-obsidiana.
+Landing de una sola página, formato portfolio comercial para TORO. Next.js
+(App Router) + TypeScript estricto + Tailwind CSS v4 + shadcn/ui, estética
+dark-tech sobre fondo obsidiana.
+
+Esta landing **convive** con `https://toro.toroverse.tech/` (la *public
+foundation*, institucional/técnica): esta es la puerta de entrada comercial
+(posicionamiento, capacidades, portfolio, conversión a llamada
+exploratoria), no un reemplazo. Nombre, tagline, statement institucional,
+propósito, framework operativo y dirección vienen literales del canon de esa
+fuente; capacidades y portfolio son copy propio de esta landing (Rodrigo).
+Cada sitio es `canonical` de sí mismo — no hay canonical cruzado entre
+dominios.
 
 ### Cómo correr el proyecto
 
@@ -35,15 +43,15 @@ src/
     sitemap.ts / robots.ts
     opengraph-image.tsx    # imagen OG generada en build
   components/
-    sections/               # Header, Hero, Capabilities, Portfolio, About,
-                             # Contact, Footer — una sección por archivo
+    sections/               # Header, Hero, Capabilities, Framework, Portfolio,
+                             # About, Contact, Footer — una sección por archivo
     mockups/                 # placeholders visuales de los 3 casos de portfolio
     ui/                       # componentes shadcn/ui (button, card, input, ...)
     logo.tsx                  # wordmark placeholder de TORO
   content/
     es.ts                     # TODO el copy de la landing (español, v1)
-    site.ts                   # constantes dependientes de env vars (URL, LinkedIn)
   lib/
+    site-config.ts             # config de sitio y contacto (URL, tagline, LinkedIn, foundation)
     contact-schema.ts         # esquema zod compartido cliente/servidor
 ```
 
@@ -57,6 +65,12 @@ como prop. Para la v2 con `next-intl` (es/en), el plan es:
 2. Resolver qué archivo importar según el locale activo (p. ej. un helper
    `getCopy(locale)` en lugar del `import { copy } from "@/content/es"` actual).
 3. Ningún componente de `src/components` necesita cambios.
+
+El tagline institucional (`"Building intelligence. Creating impact."`) tiene
+una discrepancia sin resolver con el header de `toro.toroverse.tech`
+(`"Intelligence into operation"`). Vive como constante aislada en
+`src/lib/site-config.ts` (`siteConfig.tagline`) para cambiarla en un solo
+lugar cuando Rodrigo defina cuál queda.
 
 ### Reemplazar el logo
 
@@ -79,6 +93,23 @@ reemplazar por una captura real, cambiar ese componente por una `<img>` (o
 `next/image`) con el screenshot correspondiente — el resto de la sección
 (texto, layout de la card) no cambia.
 
+### Datos de contacto — política
+
+El único dato de contacto visible en la página es la ubicación ("Córdoba,
+Argentina", en el footer). El sitio oficial (`toro.toroverse.tech`) excluye
+a propósito email, teléfono, redes y dirección postal de sus endpoints
+públicos (`source_policy`) — esta landing respeta la misma política:
+
+- Todo dato de contacto vive centralizado en `src/lib/site-config.ts`.
+- Si un dato no está confirmado (LinkedIn, teléfono, etc.), el valor queda
+  vacío y el componente **no renderiza** el ícono, el link ni la fila
+  asociada. Nunca se usa un placeholder falso (`info@toro.com`, un teléfono
+  inventado, etc.) — en una web pública, un dato falso es peor que un hueco.
+- El email de destino del formulario (`CONTACT_TO_EMAIL`) **no se muestra
+  nunca como `mailto:` visible** ni se commitea con un valor real: es una
+  casilla personal y el repo es público. Vive solo como variable de entorno,
+  consumida server-side por la Server Action de contacto.
+
 ### Variables de entorno
 
 Ver `.env.example`. Ninguna es obligatoria para que el build o el `pnpm dev`
@@ -86,10 +117,10 @@ funcionen:
 
 | Variable | Uso | Si falta |
 |---|---|---|
-| `NEXT_PUBLIC_SITE_URL` | metadata, OG image, sitemap/robots | usa un valor de placeholder de Vercel |
+| `NEXT_PUBLIC_SITE_URL` | metadata, OG image, canonical, sitemap/robots | usa un valor de placeholder de Vercel |
 | `NEXT_PUBLIC_LINKEDIN_URL` | ícono de LinkedIn en el footer | el ícono no se renderiza |
-| `CONTACT_WEBHOOK_URL` | destino POST del formulario de contacto | se intenta `CONTACT_TO_EMAIL`, si tampoco hay, solo se loguea server-side |
-| `CONTACT_TO_EMAIL` | referencia de destino por email (sin proveedor conectado aún) | ídem — se loguea server-side |
+| `RESEND_API_KEY` + `CONTACT_TO_EMAIL` | entrega del formulario por email (Resend) | se intenta `CONTACT_WEBHOOK_URL` |
+| `CONTACT_WEBHOOK_URL` | destino POST del formulario si no hay Resend configurado | se loguea server-side, el usuario igual ve éxito |
 
 ### Formulario de contacto
 
@@ -101,9 +132,14 @@ funcionen:
 - revalida con el mismo esquema zod (defensa en profundidad),
 - descarta silenciosamente envíos de bots (honeypot `company_website`),
 - aplica un rate limit simple en memoria por IP,
-- despacha a `CONTACT_WEBHOOK_URL` si está configurada; si no, deja
-  constancia en los logs del server (no hay proveedor de email conectado en
-  v1 — ver tabla de env vars arriba).
+- despacha con esta precedencia: `RESEND_API_KEY` + `CONTACT_TO_EMAIL` (vía
+  Resend) → `CONTACT_WEBHOOK_URL` (POST JSON) → si no hay ninguna, loguea
+  server-side y degrada a éxito sin exponer el detalle al usuario.
+
+`RESEND_API_KEY` está **pendiente** — crear la cuenta del proveedor es
+decisión de Rodrigo. Hasta que la pase, el formulario funciona de punta a
+punta (valida, responde, muestra éxito) pero no entrega el mensaje a nadie;
+queda solo en los logs del server.
 
 ### Fuera de alcance de esta v1
 

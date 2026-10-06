@@ -2,7 +2,7 @@ import { ImageResponse } from "next/og"
 
 import { copy } from "@/content/es"
 
-export const alt = "TORO — Arquitectura digital y agentes inteligentes"
+export const alt = "TORO — Building intelligence. Creating impact."
 export const size = { width: 1200, height: 630 }
 export const contentType = "image/png"
 
@@ -43,7 +43,7 @@ export default function OpengraphImage() {
             maxWidth: 920,
           }}
         >
-          {copy.hero.heading}
+          {copy.hero.eyebrow}
         </span>
         <span
           style={{
@@ -53,7 +53,7 @@ export default function OpengraphImage() {
             maxWidth: 820,
           }}
         >
-          Arquitectura digital y agentes inteligentes para operaciones críticas.
+          {copy.hero.positioning}
         </span>
       </div>
     ),

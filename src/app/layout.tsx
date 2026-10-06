@@ -4,7 +4,7 @@ import { Analytics } from "@vercel/analytics/next"
 import { SpeedInsights } from "@vercel/speed-insights/next"
 
 import { copy } from "@/content/es"
-import { siteConfig } from "@/content/site"
+import { siteConfig } from "@/lib/site-config"
 
 import "./globals.css"
 
@@ -22,6 +22,11 @@ export const metadata: Metadata = {
   metadataBase: new URL(siteConfig.url),
   title: copy.meta.title,
   description: copy.meta.description,
+  // Cada sitio (esta landing y la public foundation en toro.toroverse.tech)
+  // es canónico de sí mismo — nunca cruzar canonical entre dominios.
+  alternates: {
+    canonical: siteConfig.url,
+  },
   openGraph: {
     title: copy.meta.title,
     description: copy.meta.description,

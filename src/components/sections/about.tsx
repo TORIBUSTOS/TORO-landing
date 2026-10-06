@@ -18,28 +18,24 @@ export function About({ copy }: { copy: Copy["about"] }) {
           >
             {copy.heading}
           </h2>
-          <div className="mt-6 flex flex-col gap-4">
-            {copy.paragraphs.map((paragraph) => (
-              <p key={paragraph} className="text-base leading-relaxed text-muted-foreground">
-                {paragraph}
-              </p>
-            ))}
-          </div>
+          <p className="mt-6 text-base leading-relaxed text-muted-foreground">
+            {copy.purpose}
+          </p>
         </div>
 
-        <dl className="grid gap-5 self-start sm:grid-cols-1">
-          {copy.pillars.map((pillar) => (
-            <div
-              key={pillar.title}
-              className="rounded-xl border border-white/8 bg-card/60 p-5"
-            >
-              <dt className="text-sm font-medium text-foreground">{pillar.title}</dt>
-              <dd className="mt-1.5 text-sm text-muted-foreground">
-                {pillar.description}
-              </dd>
-            </div>
-          ))}
-        </dl>
+        <div className="self-start rounded-xl border border-white/8 bg-card/60 p-5">
+          <span className="text-xs font-medium tracking-wide text-muted-foreground uppercase">
+            {copy.directoryHeading}
+          </span>
+          <dl className="mt-4 flex flex-col gap-4">
+            {copy.directory.map((entry) => (
+              <div key={entry.name}>
+                <dt className="text-base font-medium text-foreground">{entry.name}</dt>
+                <dd className="mt-0.5 text-sm text-muted-foreground">{entry.role}</dd>
+              </div>
+            ))}
+          </dl>
+        </div>
       </div>
     </section>
   )

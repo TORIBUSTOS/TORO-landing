@@ -1,9 +1,9 @@
 import Link from "next/link"
-import { Link2 } from "lucide-react"
+import { ArrowUpRight, Link2 } from "lucide-react"
 
 import { Logo } from "@/components/logo"
 import type { Copy } from "@/content/es"
-import { siteConfig } from "@/content/site"
+import { siteConfig } from "@/lib/site-config"
 
 export function Footer({ copy }: { copy: Copy["footer"] }) {
   return (
@@ -12,6 +12,15 @@ export function Footer({ copy }: { copy: Copy["footer"] }) {
         <div className="flex flex-col gap-2">
           <Logo />
           <p className="max-w-sm text-sm text-muted-foreground">{copy.tagline}</p>
+          <Link
+            href={siteConfig.foundationUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex w-fit items-center gap-1 text-sm text-muted-foreground transition-colors hover:text-foreground focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-ring"
+          >
+            {copy.foundationLinkLabel}
+            <ArrowUpRight aria-hidden="true" className="size-3.5" />
+          </Link>
         </div>
 
         <div className="flex flex-col items-start gap-3 sm:items-end">
