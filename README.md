@@ -136,6 +136,14 @@ funcionen:
   Resend) → `CONTACT_WEBHOOK_URL` (POST JSON) → si no hay ninguna, loguea
   server-side y degrada a éxito sin exponer el detalle al usuario.
 
+El rate limit es un `Map` en memoria del proceso: en **v1 ya es una
+limitación real**, no solo a futuro — el target de deploy es Vercel, donde
+cada invocación de la Server Action puede correr en una instancia
+serverless distinta, así que el conteo no se comparte entre invocaciones de
+forma confiable. Protege contra un bot repitiendo sobre la misma instancia
+tibia, pero no es una defensa robusta contra spam. Si hace falta algo más
+serio antes de v2, mover el conteo a un store compartido (Redis/Upstash).
+
 `RESEND_API_KEY` está **pendiente** — crear la cuenta del proveedor es
 decisión de Rodrigo. Hasta que la pase, el formulario funciona de punta a
 punta (valida, responde, muestra éxito) pero no entrega el mensaje a nadie;
